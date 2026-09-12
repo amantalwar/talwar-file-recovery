@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.img
+*.dd
+*.bin
+Recovered*/
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
