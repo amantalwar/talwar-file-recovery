@@ -32,15 +32,45 @@ I deleted wedding footage from the microSD card in my DJI Pocket 4. Every recove
 - Python 3.10 or newer, with tkinter (included in the standard python.org installer)
 - Nothing else. No `pip install`.
 
-## Run it
+## Getting started (no GitHub account or git needed)
 
-Double-click `Run Talwar File Recovery.bat`, or from a terminal:
+**Step 1: Install Python (one time)**
+
+1. Go to https://www.python.org/downloads/ and click the yellow **Download Python 3.x** button.
+2. Run the installer. On the first screen **tick "Add python.exe to PATH"** at the bottom, then click **Install Now**.
+
+**Step 2: Download this app**
+
+1. On this page, click the green **Code** button, then **Download ZIP**.
+2. In your Downloads folder, right-click `talwar-file-recovery-main.zip`, choose **Extract All...**, then **Extract**.
+3. Move the extracted folder to your Desktop.
+
+**Step 3: Run it**
+
+1. Open the folder and double-click **Run Talwar File Recovery.bat**.
+2. If Windows shows "Windows protected your PC", click **More info**, then **Run anyway**. That warning appears for any downloaded script; the code is right here for anyone to read.
+3. Read the terms, tick the checkbox, click **I understand and accept**.
+
+Or, from a terminal:
 
 ```
 py -3 talwar_file_recovery.py
 ```
 
-If Windows refuses raw access to a drive (rare for removable media, common for internal disks), right-click the `.bat` and choose **Run as administrator**.
+**Step 4: Use it**
+
+1. Plug in the SD card or USB drive. Stop using it in the camera from now on.
+2. **1. Drive**: pick the card from the dropdown (removable drives are listed first).
+3. **2. Scan**: leave **Quick** selected and click **Start scan**. Results appear in seconds. If the file you want isn't there, scan again with **Deep**, which takes longer.
+4. **3. Results**: rows rated **Good** are the best candidates. Use the **Type** dropdown to show only Videos or Photos.
+5. **4. Recover**: click the rows you want (hold Ctrl to pick several, or click **Select good**). Click **Browse...** and choose a folder on your computer, not on the card. Click **Recover selected**.
+6. When it finishes, click **Yes** to open the folder and check the files yourself.
+
+**If something goes wrong**
+
+- "Python was not found": Step 1 was skipped or the PATH box wasn't ticked. Reinstall Python and tick it.
+- "Access denied" when scanning: right-click the `.bat` and choose **Run as administrator**.
+- The card doesn't appear in the list: unplug and replug it, then click **Refresh**.
 
 ## Important advice before you scan
 
