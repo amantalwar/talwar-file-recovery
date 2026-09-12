@@ -2,8 +2,9 @@
 """
 Talwar File Recovery - deleted file recovery for FAT32 / exFAT memory cards (Windows).
 
-Pick a drive, scan, tick the files you want, recover them to a folder.
-The source drive is only ever opened for reading.
+Pick a drive, scan, tick the entries you want, copy them to a folder.
+The source drive is only ever opened for reading. No result is guaranteed:
+see TERMS.md. Use at your own risk.
 
 Scan modes
   Quick  - walks the file system and lists entries that are marked deleted
@@ -1340,6 +1341,97 @@ def human(n):
 
 
 # --------------------------------------------------------------------------
+# Terms acknowledgment (shown once, before the main window opens)
+# --------------------------------------------------------------------------
+
+TERMS_VERSION = "1"
+TERMS_TEXT = """Talwar File Recovery is free, open-source software provided "AS IS" under the MIT License and the Terms of Use and Disclaimer (TERMS.md).
+
+NO GUARANTEE OF RECOVERY. This tool attempts to locate and copy data from a storage device. It does not and cannot guarantee that any file will be found, recovered, complete, uncorrupted, or usable. Ratings such as "Good", "Fair" and "Poor" are estimates, not promises.
+
+RISK OF DATA LOSS. Working with storage devices carries inherent risk. You are solely responsible for backing up your data, for choosing where output is written, and for verifying any output. If the data matters, consider a professional data-recovery service before running any software, including this one.
+
+NO WARRANTY, NO LIABILITY. To the maximum extent permitted by law, the author, copyright holder and contributors are not liable for any damages, data loss, or other loss arising from use of this software, and you agree to indemnify them against claims arising from your use of it.
+
+LAWFUL USE ONLY. You confirm that you have the legal right to access and recover data from any device you use this software on.
+
+By clicking "I understand and accept" you confirm that you have read and agree to these terms."""
+
+
+def terms_marker_path():
+    base = os.environ.get("APPDATA") or os.path.expanduser("~")
+    return os.path.join(base, "TalwarFileRecovery", "terms_accepted_v%s" % TERMS_VERSION)
+
+
+def terms_already_accepted():
+    try:
+        return os.path.exists(terms_marker_path())
+    except Exception:
+        return False
+
+
+def remember_terms_accepted():
+    try:
+        p = terms_marker_path()
+        os.makedirs(os.path.dirname(p), exist_ok=True)
+        with open(p, "w") as f:
+            f.write(datetime.datetime.now().isoformat())
+    except Exception:
+        pass
+
+
+def show_terms_dialog():
+    """Modal terms dialog. Returns True if accepted, False otherwise."""
+    root = tk.Tk()
+    root.title(APP_NAME + " - Terms of Use")
+    root.configure(bg=BG)
+    root.resizable(False, False)
+    accepted = {"ok": False}
+    ttk.Style(root).theme_use("clam")
+    frame = tk.Frame(root, bg=BG, padx=20, pady=16)
+    frame.pack(fill="both", expand=True)
+    tk.Label(frame, text="Please read before continuing", bg=BG, fg=FG,
+             font=("Segoe UI Semibold", 14)).pack(anchor="w")
+    box = tk.Text(frame, width=88, height=17, wrap="word", bg=PANEL, fg=FG, relief="flat",
+                  padx=12, pady=10, font=("Segoe UI", 10))
+    box.insert("1.0", TERMS_TEXT)
+    box.configure(state="disabled")
+    box.pack(pady=(10, 12))
+    agree = tk.BooleanVar(value=False)
+    chk = tk.Checkbutton(frame, text="I have read and agree to the Terms of Use and Disclaimer, and I understand that no file recovery is guaranteed.",
+                         variable=agree, bg=BG, fg=FG, selectcolor=PANEL, activebackground=BG,
+                         activeforeground=FG, wraplength=640, justify="left")
+    chk.pack(anchor="w")
+    btns = tk.Frame(frame, bg=BG)
+    btns.pack(fill="x", pady=(14, 0))
+    ok_btn = tk.Button(btns, text="I understand and accept", state="disabled", bg=ACCENT, fg="white",
+                       activebackground="#2f77e0", activeforeground="white", relief="flat", padx=16, pady=6,
+                       font=("Segoe UI Semibold", 10))
+    quit_btn = tk.Button(btns, text="Quit", bg=PANEL, fg=FG, activebackground="#2f3745", activeforeground=FG,
+                         relief="flat", padx=16, pady=6, command=root.destroy)
+
+    def on_agree(*_):
+        ok_btn.configure(state="normal" if agree.get() else "disabled")
+
+    def on_ok():
+        accepted["ok"] = True
+        remember_terms_accepted()
+        root.destroy()
+
+    agree.trace_add("write", on_agree)
+    ok_btn.configure(command=on_ok)
+    ok_btn.pack(side="right")
+    quit_btn.pack(side="right", padx=(0, 8))
+    root.protocol("WM_DELETE_WINDOW", root.destroy)
+    root.update_idletasks()
+    x = (root.winfo_screenwidth() - root.winfo_reqwidth()) // 2
+    y = (root.winfo_screenheight() - root.winfo_reqheight()) // 2
+    root.geometry("+%d+%d" % (max(0, x), max(0, y)))
+    root.mainloop()
+    return accepted["ok"]
+
+
+# --------------------------------------------------------------------------
 # GUI
 # --------------------------------------------------------------------------
 
@@ -1422,7 +1514,7 @@ class App(tk.Tk):
         top = ttk.Frame(self)
         top.pack(fill="x", **pad)
         ttk.Label(top, text=APP_NAME, style="Title.TLabel").pack(side="left")
-        ttk.Label(top, text="   deleted file recovery for SD cards and USB drives   |   source drive is never written to",
+        ttk.Label(top, text="   attempts to recover deleted files from SD cards and USB drives   |   read-only on the source   |   no result guaranteed, see TERMS.md",
                   style="Muted.TLabel").pack(side="left", pady=(6, 0))
 
         # step 1: drive
@@ -1771,6 +1863,8 @@ class App(tk.Tk):
 
 
 def main():
+    if not terms_already_accepted() and not show_terms_dialog():
+        return
     app = App()
     app.mainloop()
 
