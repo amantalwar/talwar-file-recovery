@@ -111,4 +111,4 @@ Issues and pull requests are welcome. Keep it a single file with no dependencies
 
 MIT. See [LICENSE](LICENSE). Use of the software is subject to the [Terms of Use and Disclaimer](TERMS.md), which you accept the first time you run it.
 
-Built with [Claude Code](https://claude.com/claude-code).
+Built by [Aman Talwar](https://amantalwar.com) with [Claude Code](https://claude.com/claude-code).
